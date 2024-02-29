@@ -5,5 +5,6 @@ export const sessionTTL = 60 * 60 * 24 * 2;
 interface JwtTokenPayload {
   id: string;
   admin: boolean;
+  username: string;
 }
 export { JwtTokenPayload };

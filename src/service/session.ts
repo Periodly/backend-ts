@@ -11,16 +11,17 @@ export const login = async (username: string, password: string): Promise<string>
   );
 
   if (user) {
-    return generateToken(user.id, user.admin);
+    return generateToken(user.id, user.admin, username);
   }
   throw "Can't authenticate user";
 };
 
-const generateToken = (id: string, admin: boolean): string => {
+const generateToken = (id: string, admin: boolean, username: string): string => {
   return jwt.sign(
     <JwtTokenPayload>{
       id,
       admin,
+      username
     },
     secret_token,
     {

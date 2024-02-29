@@ -30,6 +30,7 @@ export async function authorizeUser(token: string): Promise<JwtTokenPayload> {
     return {
       admin: verified.admin,
       id: verified.id,
+      username: verified.username
     };
   } catch (err: any) {
     throw "Can't authorize user";
