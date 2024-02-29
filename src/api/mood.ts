@@ -1,5 +1,6 @@
 import express, { Response, Request } from 'express';
 import { header } from 'express-validator';
+import { getMoods } from '../service/mood';
 
 const moodRouter = express.Router();
 

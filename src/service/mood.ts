@@ -1,7 +1,7 @@
-import { authorizeUser } from "./user";
+import { authorizeUser } from './user';
+import { sequelize } from '../db';
 
-const getMoods = async (token: string) => {
+export const getMoods = async (token: string) => {
   const username = (await authorizeUser(token)).username;
-  // get table named after user and return everything
-  
+  return await sequelize.query(`SELECT * FROM moods WHERE username = '${username}'`);
 };
