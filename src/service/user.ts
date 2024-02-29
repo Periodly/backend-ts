@@ -5,7 +5,6 @@ import { pool } from "../db";
 
 export async function createUser(username: string, password: string, isAdmin: boolean, token: string): Promise<void> {
     await authorizeAdmin(token);
-
     try {
         await pool.query(
             `INSERT INTO users (username, password, isAdmin) VALUES (?, ?, ?)`,
@@ -19,7 +18,6 @@ export async function createUser(username: string, password: string, isAdmin: bo
 export async function authorizeUser(token: string): Promise<JwtTokenPayload> {
     try {
         const verified: JwtTokenPayload = jwt.verify(token, secret_token) as JwtTokenPayload;
-
         return {
             admin: verified.admin,
             id: verified.id
