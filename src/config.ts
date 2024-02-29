@@ -1,9 +1,6 @@
-export const port = 8080;
 export const minPasswordLength = 4;
-
-export const secret_token: string = process.env.SALT!;
+export const secret_token: string = "saoidi2e90ds";
 export const sessionTTL = 60 * 60 * 24 * 2;
-
 
 interface JwtTokenPayload {
     id: string,
