@@ -3,7 +3,7 @@ import {pool} from "../db";
 import jwt from "jsonwebtoken";
 import {JwtTokenPayload, secret_token, sessionTTL} from "../config";
 
-export async function login(username: string, password: string): Promise<string> {
+export const login = async (username: string, password: string): Promise<string> => {
     const hashedPassword = hashPassword(password);
     const user = await pool.query(`SELECT id, isAdmin FROM users WHERE username = ? AND password = ?`, [username, hashedPassword])
 
@@ -13,7 +13,7 @@ export async function login(username: string, password: string): Promise<string>
     throw "Can't authenticate user"
 }
 
-function generateToken(id: string, admin: boolean): string {
+const generateToken = (id: string, admin: boolean): string => {
     return jwt.sign(<JwtTokenPayload>{
         id, admin
     }, secret_token, {
