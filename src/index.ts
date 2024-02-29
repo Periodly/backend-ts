@@ -2,6 +2,7 @@ import express, { Express } from 'express';
 import dotenv from 'dotenv';
 import sessionRouter from './api/session';
 import userRouter from './api/user';
+import './db';
 
 dotenv.config();
 
