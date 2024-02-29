@@ -1,5 +1,5 @@
 import express, { Response, Request } from 'express';
-import { body, header } from 'express-validator';
+import { body, header, validationResult } from 'express-validator';
 import { minPasswordLength } from '../config';
 import { createUser } from '../service/user';
 
@@ -12,14 +12,23 @@ userRouter.post(
   body('password').isString().isLength({
     min: minPasswordLength,
   }),
-  body('admin').isBoolean(),
-  header('Authorization').isString().contains('Bearer'),
+  body('isAdmin').optional().isBoolean(),
+  body('isAdmin').custom((value, { req }) => {
+    if (value && !req.headers!.authorization) {
+      throw new Error('Authorization needed');
+    }
+    return true;
+  }),
+  header('Authorization').optional().isString(),
   (req: Request, res: Response) => {
-    const token = req.get('Authorization')!.substring(7);
-
-    createUser(req.body.username, req.body.password, req.body.admin, token)
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      return res.status(400).json({ errors: errors.array() });
+    }
+    const isAdmin = req.body.isAdmin || false;
+    createUser(req.body.username, req.body.password, isAdmin, req.headers.authorization)
       .then(() => res.sendStatus(200))
-      .catch((err) => 'Error occured ' + err);
+      .catch((err) => res.status(400).send(err));
   },
 );
 

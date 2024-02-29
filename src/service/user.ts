@@ -7,15 +7,21 @@ export async function createUser(
   username: string,
   password: string,
   isAdmin: boolean,
-  token: string,
+  token?: string,
 ): Promise<void> {
   try {
+    const adminAccess = token ? (await authorizeAdmin(token)).admin : false;
+    if (isAdmin && !adminAccess) return Promise.reject('Authorization needed');
     const hashedPassword = hashPassword(password);
-    await User.create({
-      username,
-      password: hashedPassword,
-      isAdmin,
+    const [user, created] = await User.findOrCreate({
+      where: { username },
+      defaults: {
+        username,
+        password: hashedPassword,
+        isAdmin,
+      },
     });
+    if (!created) return Promise.reject('User already exists');
   } catch (err: any) {
     throw 'User already exists';
   }
