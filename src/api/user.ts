@@ -1,7 +1,7 @@
-import express, { Response, Request } from "express";
-import { body, header } from "express-validator";
-import { minPasswordLength } from "../config";
-import { createUser } from "../service/user";
+import express, { Response, Request } from 'express';
+import { body, header } from 'express-validator';
+import { minPasswordLength } from '../config';
+import { createUser } from '../service/user';
 
 const userRouter = express.Router();
 
@@ -12,15 +12,15 @@ userRouter.post(
   body('password').isString().isLength({
     min: minPasswordLength,
   }),
-  body("admin").isBoolean(),
-  header("Authorization").isString().contains("Bearer"),
+  body('admin').isBoolean(),
+  header('Authorization').isString().contains('Bearer'),
   (req: Request, res: Response) => {
-    const token = req.get("Authorization")!.substring(7);
+    const token = req.get('Authorization')!.substring(7);
 
     createUser(req.body.username, req.body.password, req.body.admin, token)
       .then(() => res.sendStatus(200))
-      .catch((err) => "Error occured " + err);
-  }
+      .catch((err) => 'Error occured ' + err);
+  },
 );
 
 export default userRouter;

@@ -1,3 +1,3 @@
 const getMoods = (token: string) => {
-    throw "Function not implemented"
-}
+  throw 'Function not implemented';
+};

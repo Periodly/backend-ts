@@ -4,5 +4,5 @@ export const pool = mariadb.createPool({
   host: 'localhost',
   user: 'root',
   database: 'prdly',
-  connectionLimit: 5
+  connectionLimit: 5,
 });
