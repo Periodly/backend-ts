@@ -6,17 +6,4 @@ interface JwtTokenPayload {
     id: string,
     admin: boolean
 }
-
-enum ErrorMsg {
-    authorizationErrorMsg = 'Authorization failed',
-    authenticationErrorMsg = 'Authentication failed',
-    alreadyExistsErrorMsg = 'Object interferes with other',
-    accessDeniedErrorMsg = 'Access denied',
-    notFound = 'Target not found',
-    unprocessableEntity = 'Unprocessable Entity'
-}
-
-export {
-    ErrorMsg,
-    JwtTokenPayload
-}
+export { JwtTokenPayload }

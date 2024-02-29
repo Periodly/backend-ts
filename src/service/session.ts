@@ -1,7 +1,7 @@
 import {hashPassword} from "../tools/password";
 import {pool} from "../db";
 import jwt from "jsonwebtoken";
-import {ErrorMsg, JwtTokenPayload, secret_token, sessionTTL} from "../config";
+import {JwtTokenPayload, secret_token, sessionTTL} from "../config";
 
 export async function login(username: string, password: string): Promise<string> {
     const hashedPassword = hashPassword(password);
@@ -10,7 +10,7 @@ export async function login(username: string, password: string): Promise<string>
     if (user) {
         return generateToken(user.id, user.admin);
     }
-    throw ErrorMsg.authenticationErrorMsg;
+    throw "Can't authenticate user"
 }
 
 function generateToken(id: string, admin: boolean): string {

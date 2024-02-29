@@ -1,4 +1,4 @@
-import { ErrorMsg, JwtTokenPayload, secret_token } from "../config";
+import { JwtTokenPayload, secret_token } from "../config";
 import jwt from "jsonwebtoken";
 import { hashPassword } from "../tools/password";
 import { pool } from "../db";
@@ -10,8 +10,11 @@ export async function createUser(username: string, password: string, isAdmin: bo
             `INSERT INTO users (username, password, isAdmin) VALUES (?, ?, ?)`,
             [username, hashPassword(password), isAdmin]
         )
+        await pool.query(
+            `CREATE TABLE ${username} (id INT AUTO_INCREMENT, data DATE, mood TEXT, PRIMARY KEY (id))`
+        )
     } catch (err: any) {
-        throw ErrorMsg.alreadyExistsErrorMsg;
+        throw "User already exists"
     }
 }
 
@@ -23,12 +26,12 @@ export async function authorizeUser(token: string): Promise<JwtTokenPayload> {
             id: verified.id
         };
     } catch (err: any) {
-        throw ErrorMsg.authorizationErrorMsg;
+        throw "Can't authorize user"
     }
 }
 
 export async function authorizeAdmin(token: string): Promise<JwtTokenPayload> {
     const sessionData = await authorizeUser(token);
-    if (!sessionData!.admin) throw ErrorMsg.accessDeniedErrorMsg;
+    if (!sessionData!.admin) throw "Access denied"
     return sessionData;
 }
