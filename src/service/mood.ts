@@ -1,7 +1,8 @@
 import { authorizeUser } from './user';
 import { sequelize } from '../db';
+import MoodModel from '../model/mood.model';
 
 export const getMoods = async (token: string) => {
-  const username = (await authorizeUser(token)).username;
-  return await sequelize.query(`SELECT * FROM moods WHERE username = '${username}'`);
+  const userId = (await authorizeUser(token)).id;
+  return await MoodModel.findAll({ where: { userId } });
 };

@@ -4,7 +4,7 @@ import { getMoods } from '../service/mood';
 
 const moodRouter = express.Router();
 
-// user registration
+// get all mood entries
 moodRouter.get(
   '/',
   header('Authorization').isString().contains('Bearer'),
@@ -12,7 +12,7 @@ moodRouter.get(
     const token = req.get('Authorization')!.substring(7);
 
     getMoods(token)
-      .then(() => res.sendStatus(200))
+      .then((moods) => res.json({ moods }))
       .catch((err) => 'Error occured ' + err);
   },
 );
