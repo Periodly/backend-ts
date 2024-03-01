@@ -1,9 +1,10 @@
 import { dbConfig } from './config';
 import mariadb from 'mariadb';
 import { Sequelize } from 'sequelize';
-import userModel, { initUserModel } from './model/user.model';
+import UserModel, { initUserModel } from './model/user.model';
 import { initSessionModel } from './model/session.model';
 import { hashPassword } from './tools/password';
+import MoodModel, { initMoodModel } from './model/mood.model';
 
 export const sequelize = new Sequelize(dbConfig.database, dbConfig.user, '', {
   dialect: 'mariadb',
@@ -24,9 +25,9 @@ async function initializeDb() {
     await sequelize.authenticate();
     await sequelize.sync();
     // if admin user does not exist, create it
-    const admin = await userModel.findOne({ where: { username: 'admin' } });
+    const admin = await UserModel.findOne({ where: { username: 'admin' } });
     if (!admin) {
-      await userModel.create({
+      await UserModel.create({
         username: 'admin',
         password: hashPassword('admin'),
         isAdmin: true,
@@ -40,3 +41,6 @@ async function initializeDb() {
 
 initUserModel(sequelize);
 initSessionModel(sequelize);
+initMoodModel(sequelize);
+MoodModel.hasMany(UserModel, { foreignKey: 'userId' });
+UserModel.belongsTo(MoodModel);
