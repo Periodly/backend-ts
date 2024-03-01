@@ -5,6 +5,7 @@ import UserModel, { initUserModel } from './model/user.model';
 import { initSessionModel } from './model/session.model';
 import { hashPassword } from './tools/password';
 import MoodModel, { initMoodModel } from './model/mood.model';
+import FriendsModel, { initFriendsModel } from './model/friends.model';
 
 export const sequelize = new Sequelize(dbConfig.database, dbConfig.user, '', {
   dialect: 'mariadb',
@@ -42,5 +43,12 @@ async function initializeDb() {
 initUserModel(sequelize);
 initSessionModel(sequelize);
 initMoodModel(sequelize);
+initFriendsModel(sequelize);
+
 MoodModel.hasMany(UserModel, { foreignKey: 'userId' });
 UserModel.belongsTo(MoodModel);
+
+FriendsModel.belongsTo(UserModel, { foreignKey: 'userId', as: 'user' });
+FriendsModel.belongsTo(UserModel, { foreignKey: 'friendId', as: 'friend' });
+UserModel.hasMany(FriendsModel, { foreignKey: 'userId', as: 'friends' });
+UserModel.hasMany(FriendsModel, { foreignKey: 'friendId', as: 'friendOf' });
