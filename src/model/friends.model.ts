@@ -1,9 +1,12 @@
 import { DataTypes, Model, Sequelize } from 'sequelize';
+import UserModel from './user.model';
 
 class FriendsModel extends Model {
   declare id: number;
   declare userId: number;
   declare friendId: number;
+  declare friends: UserModel;
+  declare users: UserModel;
 }
 
 export const initFriendsModel = (sequelize: Sequelize) => {
