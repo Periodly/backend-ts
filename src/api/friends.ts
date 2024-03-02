@@ -24,7 +24,7 @@ friendsRouter.get(
 // add a new friend
 friendsRouter.post(
   '/',
-  body('friendId').isNumeric(),
+  body('friendName').isString(),
   header('Authorization').isString().contains('Bearer'),
   (req: Request, res: Response) => {
     const errors = validationResult(req);
@@ -33,7 +33,7 @@ friendsRouter.post(
     }
 
     const token = req.get('Authorization')!.substring(7);
-    addFriend(token, req.body.friendId)
+    addFriend(token, req.body.friendName)
       .then((r) => res.json(r))
       .catch((err) => res.status(400).send(err));
   },
