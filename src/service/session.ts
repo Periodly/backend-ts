@@ -26,8 +26,5 @@ const generateToken = (id: number, admin: boolean, username: string): string => 
       username,
     },
     secret_token,
-    {
-      expiresIn: sessionTTL,
-    },
   );
 };
