@@ -45,9 +45,9 @@ initSessionModel(sequelize);
 initMoodModel(sequelize);
 initFriendsModel(sequelize);
 
-MoodModel.hasMany(UserModel, { foreignKey: 'userId' });
-UserModel.belongsTo(MoodModel);
+UserModel.hasOne(MoodModel);
+MoodModel.belongsTo(UserModel, { foreignKey: 'userId' });
 
-FriendsModel.hasMany(UserModel, { foreignKey: 'userId', as: 'user' });
-FriendsModel.hasMany(UserModel, { foreignKey: 'friendId', as: 'friend' });
-UserModel.belongsTo(FriendsModel);
+UserModel.hasMany(FriendsModel);
+FriendsModel.belongsTo(UserModel, { foreignKey: 'userId', as: 'users' });
+FriendsModel.belongsTo(UserModel, { foreignKey: 'friendId', as: 'friends' });
