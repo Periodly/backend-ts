@@ -1,6 +1,6 @@
 import { hashPassword } from '../tools/password';
 import jwt from 'jsonwebtoken';
-import { JwtTokenPayload, secret_token, sessionTTL } from '../config';
+import { JwtTokenPayload, secret_token } from '../config';
 import User from '../model/user.model';
 
 export const login = async (username: string, password: string): Promise<string> => {
