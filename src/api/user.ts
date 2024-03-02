@@ -26,7 +26,8 @@ userRouter.post(
       return res.status(400).json({ errors: errors.array() });
     }
     const isAdmin = req.body.isAdmin || false;
-    createUser(req.body.username, req.body.password, isAdmin, req.headers.authorization)
+    const token = req.get('Authorization')!.substring(7);
+    createUser(req.body.username, req.body.password, isAdmin, token)
       .then(() => res.sendStatus(200))
       .catch((err) => res.status(400).send(err));
   },
