@@ -5,7 +5,75 @@ import { createUser } from '../service/user';
 
 const userRouter = express.Router();
 
-// user registration
+/**
+ * @swagger
+ *   tags:
+ *     - name: Users
+ *       description: Endpoints for managing user accounts.
+ */
+
+/**
+ * @swagger
+ * /api/user/:
+ *   post:
+ *     description: Creates a new user account.
+ *     security:
+ *       - BearerAuth: []
+ *     tags: [Users]
+ *     produces:
+ *       - application/json
+ *     parameters:
+ *       - in: body
+ *         name: user
+ *         description: User information
+ *         required: true
+ *         type: object
+ *         properties:
+ *           username:
+ *             type: string
+ *             description: The user's username.
+ *             required: true
+ *           password:
+ *             type: string
+ *             description: The user's password.
+ *             required: true
+ *             minLength: ${minPasswordLength}
+ *           isAdmin:
+ *             type: boolean
+ *             description: Whether the user is an administrator (optional).
+ *             default: false
+ *       - in: header
+ *         name: Authorization
+ *         description: Bearer token for admin users creating new users (optional).
+ *         type: string
+ *         required: false
+ *     responses:
+ *       200:
+ *         description: User created successfully.
+ *       400:
+ *         description: Bad request (validation errors, authorization required for creating admins, or other error during user creation).
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 errors:
+ *                   type: array
+ *                   items:
+ *                     type: object
+ *       401:
+ *         description: Unauthorized (missing or invalid authorization token for creating admins).
+ *       500:
+ *         description: Internal server error.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   description: Error message.
+ */
 userRouter.post(
   '/',
   body('username').isString(),
