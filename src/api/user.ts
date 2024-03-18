@@ -1,7 +1,7 @@
 import express, { Response, Request } from 'express';
 import { body, header, validationResult } from 'express-validator';
 import { minPasswordLength } from '../config';
-import { createUser, getAllUsers } from '../service/user';
+import { createUser, deleteUser, getAllUsers } from '../service/user';
 
 const userRouter = express.Router();
 
@@ -178,6 +178,64 @@ userRouter.get(
     getAllUsers(token)
       .then((r) => res.json(r))
       .catch((err) => res.status(401).send(err));
+  },
+);
+
+/**
+ * @swagger
+ * /api/user/{id}:
+ *   delete:
+ *     description: Deletes a user by ID. (Requires admin privileges)
+ *     security:
+ *       - BearerAuth: []
+ *     tags: [Users]
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         description: The user's unique identifier.
+ *         required: true
+ *         type: integer
+ *     responses:
+ *       200:
+ *         description: User deleted successfully.
+ *       400:
+ *         description: Bad request (validation errors, authorization required, or other error during user deletion).
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 errors:
+ *                   type: array
+ *                   items:
+ *                     type: object
+ *       403:
+ *         description: Forbidden (insufficent privileges to delete user).
+ *       500:
+ *         description: Internal server error.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   description: Error message.
+ */
+
+userRouter.delete(
+  '/:id',
+  header('Authorization').isString().contains('Bearer'),
+  (req: Request, res: Response) => {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      return res.status(400).json({ errors: errors.array() });
+    }
+
+    const token = req.get('Authorization')!.substring(7);
+    deleteUser(token, req.params.id)
+      .then(() => res.sendStatus(200))
+      .catch((err) => res.status(403).send(err));
   },
 );
 

@@ -35,6 +35,16 @@ export async function getAllUsers(token: string): Promise<User[]> {
   });
 }
 
+export async function deleteUser(token: string, id: string): Promise<void> {
+  const adminAccess = token ? (await authorizeAdmin(token)).admin : false;
+  if (!adminAccess) throw 'Access denied';
+  await User.destroy({
+    where: {
+      id,
+    },
+  });
+}
+
 export async function authorizeUser(token: string): Promise<JwtTokenPayload> {
   try {
     const verified: JwtTokenPayload = jwt.verify(token, secret_token) as JwtTokenPayload;
