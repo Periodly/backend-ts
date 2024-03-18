@@ -14,7 +14,7 @@ const sessionRouter = express.Router();
 
 /**
  * @swagger
- * /api/session/login:
+ * /api/session/login/:
  *   post:
  *     description: Logs in a user and retrieves a JSON Web Token (JWT) for authentication.
  *     tags: [Authentication]
