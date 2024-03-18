@@ -22,6 +22,10 @@ moodRouter.get(
   },
 );
 
+moodRouter.get('/list', (req: Request, res: Response) => {
+  res.json({ moods: moodOptions });
+});
+
 // add a new mood entry
 moodRouter.post(
   '/',
