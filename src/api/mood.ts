@@ -1,6 +1,7 @@
 import express, { Response, Request } from 'express';
-import { header, validationResult } from 'express-validator';
+import { body, header, validationResult } from 'express-validator';
 import { addMood, getMoods } from '../service/mood';
+import { moodOptions } from '../config';
 
 const moodRouter = express.Router();
 
@@ -25,6 +26,7 @@ moodRouter.get(
 moodRouter.post(
   '/',
   header('Authorization').isString().contains('Bearer'),
+  body('mood').isString().isIn(moodOptions),
   (req: Request, res: Response) => {
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
