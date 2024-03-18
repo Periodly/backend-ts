@@ -44,19 +44,23 @@ const friendsRouter = express.Router();
  *     responses:
  *       200:
  *         description: List of friends.
- *         schema:
- *           type: array
- *           items:
- *             $ref: '#/definitions/Friend'
- *       400:
- *         description: Bad request (validation errors or other error during friend retrieval).
- *         schema:
- *           type: object
- *           properties:
- *             errors:
+ *         content:
+ *           application/json:
+ *             schema:
  *               type: array
  *               items:
- *                 type: object
+ *                 $ref: '#/definitions/Friend'
+ *       400:
+ *         description: Bad request (validation errors or other error during friend retrieval).
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 errors:
+ *                   type: array
+ *                   items:
+ *                     type: object
  */
 friendsRouter.get(
   '/',
@@ -93,19 +97,23 @@ friendsRouter.get(
  *     responses:
  *       200:
  *         description: Friend added successfully.
- *         schema:
- *           type: array
- *           items:
- *              type: string
- *       400:
- *         description: Bad request (validation errors, friend already exists, or other error during friend addition).
- *         schema:
- *           type: object
- *           properties:
- *             errors:
+ *         content:
+ *           application/json:
+ *             schema:
  *               type: array
  *               items:
- *                 type: object
+ *                 type: string
+ *       400:
+ *         description: Bad request (validation errors, friend already exists, or other error during friend addition).
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 errors:
+ *                   type: array
+ *                   items:
+ *                     type: object
  */
 friendsRouter.post(
   '/',
