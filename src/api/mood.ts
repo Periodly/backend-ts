@@ -66,27 +66,33 @@ const moodRouter = express.Router();
  *     responses:
  *       200:
  *         description: List of the user's moods.
- *         schema:
- *           type: array
- *           items:
- *             $ref: '#/definitions/Mood'
- *       400:
- *         description: Bad request (validation errors or other error during mood retrieval).
- *         schema:
- *           type: object
- *           properties:
- *             errors:
+ *         content:
+ *           application/json:
+ *             schema:
  *               type: array
  *               items:
- *                 type: object
+ *                 $ref: '#/definitions/Mood'
+ *       400:
+ *         description: Bad request (validation errors or other error during mood retrieval).
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 errors:
+ *                   type: array
+ *                   items:
+ *                     type: object
  *       500:
  *         description: Internal server error.
- *         schema:
- *           type: object
- *           properties:
- *             message:
- *               type: string
- *               description: Error message.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 errors:
+ *                   type: string
+ *                   description: Error message.
  */
 moodRouter.get(
   '/',
@@ -106,7 +112,7 @@ moodRouter.get(
 
 /**
  * @swagger
- * /api/mood/list:
+ * /api/mood/list/:
  *   get:
  *     description: Retrieves a list of available mood options.
  *     tags: [Moods]
@@ -115,11 +121,13 @@ moodRouter.get(
  *     responses:
  *       200:
  *         description: List of available mood options.
- *         schema:
- *           type: array
- *           items:
- *             type: string
- *             description: An individual mood option.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: array
+ *               items:
+ *                 type: string
+ *                 description: An individual mood option.
  */
 moodRouter.get('/list', (req: Request, res: Response) => {
   res.json({ moods: moodOptions });
@@ -127,7 +135,7 @@ moodRouter.get('/list', (req: Request, res: Response) => {
 
 /**
  * @swagger
- * /api/mood:
+ * /api/mood/:
  *   post:
  *     description: Creates a new mood entry for the authenticated user.
  *     security:
@@ -148,21 +156,25 @@ moodRouter.get('/list', (req: Request, res: Response) => {
  *         description: Mood created successfully.
  *       400:
  *         description: Bad request (validation errors, invalid mood option, or other error during mood creation).
- *         schema:
- *           type: object
- *           properties:
- *             errors:
- *               type: array
- *               items:
- *                 type: object
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 errors:
+ *                   type: array
+ *                   items:
+ *                     type: object
  *       500:
  *         description: Internal server error.
- *         schema:
- *           type: object
- *           properties:
- *             message:
- *               type: string
- *               description: Error message.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   description: Error message.
  */
 moodRouter.post(
   '/',
