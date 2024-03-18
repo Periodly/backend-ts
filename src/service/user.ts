@@ -27,6 +27,14 @@ export async function createUser(
   }
 }
 
+export async function getAllUsers(token: string): Promise<User[]> {
+  const adminAccess = token ? (await authorizeAdmin(token)).admin : false;
+  if (!adminAccess) throw 'Access denied';
+  return User.findAll({
+    attributes: ['id', 'username', 'isAdmin'],
+  });
+}
+
 export async function authorizeUser(token: string): Promise<JwtTokenPayload> {
   try {
     const verified: JwtTokenPayload = jwt.verify(token, secret_token) as JwtTokenPayload;

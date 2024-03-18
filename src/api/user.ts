@@ -1,7 +1,7 @@
 import express, { Response, Request } from 'express';
 import { body, header, validationResult } from 'express-validator';
 import { minPasswordLength } from '../config';
-import { createUser } from '../service/user';
+import { createUser, getAllUsers } from '../service/user';
 
 const userRouter = express.Router();
 
@@ -10,6 +10,27 @@ const userRouter = express.Router();
  *   tags:
  *     - name: Users
  *       description: Endpoints for managing user accounts.
+ */
+
+/**
+ * @swagger
+ * definitions:
+ *   User:
+ *     type: object
+ *     required:
+ *       - username
+ *       - password
+ *       - isAdmin
+ *     properties:
+ *       id:
+ *         type: integer
+ *         description: Unique identifier for the user. (Auto-generated)
+ *       username:
+ *         type: string
+ *         description: The user's username.
+ *       isAdmin:
+ *         type: boolean
+ *         description: Whether the user has admin privileges.
  */
 
 /**
@@ -98,6 +119,65 @@ userRouter.post(
     createUser(req.body.username, req.body.password, isAdmin, token)
       .then(() => res.sendStatus(200))
       .catch((err) => res.status(400).send(err));
+  },
+);
+
+/**
+ * @swagger
+ * /api/user/list/:
+ *   get:
+ *     description: Retrieves a list of all users. (Requires admin privileges)
+ *     security:
+ *       - BearerAuth: []
+ *     tags: [Users]
+ *     produces:
+ *       - application/json
+ *     responses:
+ *       200:
+ *         description: List of all users.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: array
+ *               items:
+ *                 $ref: '#/definitions/User'
+ *       400:
+ *         description: Bad request (validation errors or other error during user retrieval).
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 errors:
+ *                   type: array
+ *                   items:
+ *                     type: object
+ *       401:
+ *         description: Unauthorized (missing or invalid authorization token).
+ *       500:
+ *         description: Internal server error.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   description: Error message.
+ */
+userRouter.get(
+  '/list',
+  header('Authorization').isString().contains('Bearer'),
+  (req: Request, res: Response) => {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      return res.status(400).json({ errors: errors.array() });
+    }
+
+    const token = req.get('Authorization')!.substring(7);
+    getAllUsers(token)
+      .then((r) => res.json(r))
+      .catch((err) => res.status(401).send(err));
   },
 );
 
