@@ -1,5 +1,15 @@
 export const minPasswordLength = 4;
 export const secret_token: string = 'saoidi2e90ds';
+export const moodOptions = [
+  'happy',
+  'sad',
+  'angry',
+  'tired',
+  'hungry',
+  'excited',
+  'relaxed',
+  'stressed',
+];
 
 export const dbConfig = {
   host: 'localhost',
