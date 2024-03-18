@@ -27,8 +27,11 @@ export const addFriend = async (token: string, friendName: string) => {
   return await FriendsModel.create({ userId, friendId: friend.id });
 };
 
-export const getFriends = async (token: string) => {
-  const user = await authorizeUser(token);
+export const getFriends = async (token: string, id?: string) => {
+  const adminAccess = (await authorizeUser(token)).admin;
+  if (id && !adminAccess) return Promise.reject('Access denied');
+  const user = id ? { id: parseInt(id) } : await authorizeUser(token);
+
   const friends = await FriendsModel.findAll({
     where: { [Op.or]: [{ userId: user.id }, { friendId: user.id }] },
     include: [

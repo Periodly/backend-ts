@@ -80,6 +80,72 @@ friendsRouter.get(
 
 /**
  * @swagger
+ * /api/friends/{id}:
+ *   get:
+ *     description: Retrieves a list of friends for a given user ID (requires admin privileges).
+ *     security:
+ *       - BearerAuth: []
+ *     tags: [Friends]
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         description: The ID of the user whose friends are being retrieved.
+ *         required: true
+ *         type: integer
+ *     responses:
+ *       200:
+ *         description: List of friends.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 friends:
+ *                   type: array
+ *                   items:
+ *                     $ref: '#/definitions/User'
+ *       400:
+ *         description: Bad request (validation errors, authorization required, or other error during friend retrieval).
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 errors:
+ *                   type: array
+ *                   items:
+ *                     type: object
+ *       403:
+ *         description: Forbidden (insufficient privileges to list user's friend list).
+ *       500:
+ *         description: Internal server error.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   description: Error message.
+ */
+friendsRouter.get(
+  '/:id',
+  header('Authorization').isString().contains('Bearer'),
+  (req: Request, res: Response) => {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      return res.status(400).json({ errors: errors.array() });
+    }
+
+    const token = req.get('Authorization')!.substring(7);
+    getFriends(token, req.params.id)
+      .then((friends) => res.json({ friends }))
+      .catch((err) => res.status(400).send(err));
+  },
+);
+
+/**
+ * @swagger
  * /api/friends/:
  *   post:
  *     description: Adds a new friend to the authenticated user's friend list.
