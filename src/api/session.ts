@@ -62,12 +62,14 @@ const sessionRouter = express.Router();
  *         description: Unauthorized (invalid credentials).
  *       500:
  *         description: Internal server error.
- *         schema:
- *           type: object
- *           properties:
- *             message:
- *               type: string
- *               description: Error message.
+ *        content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   description: Error message.
  */
 sessionRouter.post(
   '/login',
