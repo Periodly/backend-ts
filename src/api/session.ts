@@ -80,7 +80,7 @@ sessionRouter.post(
   (req: Request, res: Response) => {
     login(req.body.username, req.body.password)
       .then((token) => res.json({ token }))
-      .catch((err) => 'Error occured. ' + err);
+      .catch((err) => res.status(401).send(err));
   },
 );
 
