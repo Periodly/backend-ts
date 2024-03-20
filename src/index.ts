@@ -1,12 +1,15 @@
 import express, { Express } from 'express';
 import dotenv from 'dotenv';
+import swaggerJSDoc from 'swagger-jsdoc';
+import swaggerUi from 'swagger-ui-express';
+import cors from 'cors';
+
+import './db';
+
 import sessionRouter from './api/session';
 import userRouter from './api/user';
-import './db';
 import friendsRouter from './api/friends';
 import moodRouter from './api/mood';
-import swaggerUi from 'swagger-ui-express';
-import swaggerJSDoc from 'swagger-jsdoc';
 
 dotenv.config();
 
@@ -26,6 +29,7 @@ const options = {
 const swaggerSpec = swaggerJSDoc(options);
 
 app.use(express.json());
+app.use(cors());
 app.use('/api/session', sessionRouter);
 app.use('/api/user', userRouter);
 app.use('/api/mood', moodRouter);
