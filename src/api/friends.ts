@@ -43,13 +43,16 @@ const friendsRouter = express.Router();
  *       - application/json
  *     responses:
  *       200:
- *         description: List of friends.
+ *         description: List of friends' usernames.
  *         content:
  *           application/json:
  *             schema:
- *               type: array
- *               items:
- *                 $ref: '#/definitions/Friend'
+ *               type: object
+ *               properties:
+ *                 friends:
+ *                   type: array
+ *                   items:
+ *                     type: string
  *       400:
  *         description: Bad request (validation errors or other error during friend retrieval).
  *         content:
@@ -94,7 +97,7 @@ friendsRouter.get(
  *         type: integer
  *     responses:
  *       200:
- *         description: List of friends.
+ *         description: List of friends' usernames.
  *         content:
  *           application/json:
  *             schema:
@@ -103,7 +106,7 @@ friendsRouter.get(
  *                 friends:
  *                   type: array
  *                   items:
- *                     $ref: '#/definitions/User'
+ *                     type: string
  *       400:
  *         description: Bad request (validation errors, authorization required, or other error during friend retrieval).
  *         content:
