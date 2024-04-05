@@ -18,6 +18,10 @@ export const initMoodModel = (sequelize: Sequelize) => {
       cycleId: {
         type: DataTypes.INTEGER,
         allowNull: false,
+        references: {
+          model: 'periodCycles',
+          key: 'id',
+        },
       },
       mood: {
         type: DataTypes.STRING,

@@ -23,7 +23,7 @@ export const initSymptomModel = (sequelize: Sequelize) => {
         type: DataTypes.INTEGER,
         allowNull: false,
         references: {
-          model: 'period',
+          model: 'periodCycles',
           key: 'id',
         },
       },
