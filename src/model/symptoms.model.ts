@@ -1,38 +1,42 @@
 import { DataTypes, Model, Sequelize } from 'sequelize';
 
-class MoodModel extends Model {
+class SymptomModel extends Model {
   declare id: number;
-  declare cycleId: number;
-  declare mood: string;
   declare date: Date;
+  declare cycleId: number;
+  declare symptom: string;
 }
 
-export const initMoodModel = (sequelize: Sequelize) => {
-  MoodModel.init(
+export const initSymptomModel = (sequelize: Sequelize) => {
+  SymptomModel.init(
     {
       id: {
         type: DataTypes.INTEGER,
         autoIncrement: true,
         primaryKey: true,
       },
+      date: {
+        type: DataTypes.DATE,
+        allowNull: false,
+      },
       cycleId: {
         type: DataTypes.INTEGER,
         allowNull: false,
+        references: {
+          model: 'period',
+          key: 'id',
+        },
       },
-      mood: {
+      symptom: {
         type: DataTypes.STRING,
-        allowNull: false,
-      },
-      date: {
-        type: DataTypes.DATE,
         allowNull: false,
       },
     },
     {
       sequelize,
-      tableName: 'moods',
+      tableName: 'symptoms',
     },
   );
 };
 
-export default MoodModel;
+export default SymptomModel;

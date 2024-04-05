@@ -6,6 +6,9 @@ import { initSessionModel } from './model/session.model';
 import { hashPassword } from './tools/password';
 import MoodModel, { initMoodModel } from './model/mood.model';
 import FriendsModel, { initFriendsModel } from './model/friends.model';
+import PeriodCycleModel, { initPeriodCycleModel } from './model/periodCycle.model';
+import SymptomModel, { initSymptomModel } from './model/symptoms.model';
+import TypicalCycleModel, { initTypicalCycleModel } from './model/typicalCycle.model';
 
 export const sequelize = new Sequelize(dbConfig.database, dbConfig.user, '', {
   dialect: 'mariadb',
@@ -44,10 +47,22 @@ initUserModel(sequelize);
 initSessionModel(sequelize);
 initMoodModel(sequelize);
 initFriendsModel(sequelize);
+initPeriodCycleModel(sequelize);
+initSymptomModel(sequelize);
+initTypicalCycleModel(sequelize);
 
-UserModel.hasOne(MoodModel);
-MoodModel.belongsTo(UserModel, { foreignKey: 'userId' });
+PeriodCycleModel.hasOne(MoodModel);
+MoodModel.belongsTo(PeriodCycleModel, { foreignKey: 'cycleId' });
 
 UserModel.hasMany(FriendsModel);
 FriendsModel.belongsTo(UserModel, { foreignKey: 'userId', as: 'users' });
 FriendsModel.belongsTo(UserModel, { foreignKey: 'friendId', as: 'friends' });
+
+UserModel.hasOne(TypicalCycleModel);
+TypicalCycleModel.belongsTo(UserModel, { foreignKey: 'userId' });
+
+UserModel.hasMany(PeriodCycleModel);
+PeriodCycleModel.belongsTo(UserModel, { foreignKey: 'userId' });
+
+PeriodCycleModel.hasMany(SymptomModel);
+SymptomModel.belongsTo(PeriodCycleModel, { foreignKey: 'cycleId' });
