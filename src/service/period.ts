@@ -37,10 +37,37 @@ export const updateTypicalPeriod = async (
   });
 };
 
+export const getPreviousPeriodCycles = async (token: string, cycleCount: number) => {
+  const userId = (await authorizeUser(token)).id;
+  const periods = await PeriodCycleModel.findAll({
+    where: { userId },
+    order: [['from', 'DESC']],
+    attributes: ['id'],
+  });
+
+  if (cycleCount > periods.length) {
+    throw new Error('No previous, matching, period cycle found');
+  }
+
+  return getPeriodCycle(periods[cycleCount - 1].id);
+};
+
 export const getCurrentPeriodCycle = async (token: string) => {
   const userId = (await authorizeUser(token)).id;
   const period = await PeriodCycleModel.findOne({
     where: { userId, to: null },
+  });
+
+  if (!period) {
+    throw new Error('No active period cycle found');
+  }
+
+  return getPeriodCycle(period.id);
+};
+
+const getPeriodCycle = async (cycleId: number) => {
+  const period = await PeriodCycleModel.findOne({
+    where: { id: cycleId },
     attributes: ['id', 'from', 'predictedTo'],
   });
 
@@ -49,13 +76,13 @@ export const getCurrentPeriodCycle = async (token: string) => {
   }
 
   const cycleMoods = await MoodModel.findAll({
-    where: { cycleId: period.id },
+    where: { cycleId },
     order: [['createdAt', 'DESC']],
     attributes: ['id', 'date', 'mood'],
   });
 
   const cycleSymptoms = await SymptomModel.findAll({
-    where: { cycleId: period.id },
+    where: { cycleId },
     order: [['createdAt', 'DESC']],
     attributes: ['id', 'date', 'symptom'],
   });

@@ -2,6 +2,7 @@ import { Router, Request, Response } from 'express';
 import { body, header, validationResult } from 'express-validator';
 import {
   getCurrentPeriodCycle,
+  getPreviousPeriodCycles,
   getTypicalPeriod,
   initNewPeriodCycle,
   recordMood,
@@ -193,6 +194,23 @@ periodRouter.get(
 
     getCurrentPeriodCycle(token)
       .then((periodCycle) => res.json(periodCycle))
+      .catch((err) => res.status(403).send(err));
+  },
+);
+
+periodRouter.get(
+  '/previous/:cycleCount',
+  header('Authorization').isString().withMessage('Authorization header is required'),
+  (req: Request, res: Response) => {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      return res.status(400).json({ errors: errors.array() });
+    }
+    const token = req.get('Authorization')!.substring(7);
+    const cycleCount = parseInt(req.params.cycleCount, 10);
+
+    getPreviousPeriodCycles(token, cycleCount)
+      .then((periodCycles) => res.json(periodCycles))
       .catch((err) => res.status(403).send(err));
   },
 );
