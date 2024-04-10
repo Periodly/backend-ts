@@ -142,9 +142,6 @@ const periodRouter = Router();
  *         example: 2021-01-07T00:00:00Z
  */
 
-/**
- * @swagger
- */
 periodRouter.get(
   '/typical',
   header('Authorization').isString().withMessage('Authorization header is required'),
@@ -184,9 +181,6 @@ periodRouter.put(
   },
 );
 
-/**
- * @swagger
- */
 periodRouter.get(
   '/current',
   header('Authorization').isString().withMessage('Authorization header is required'),
@@ -203,9 +197,6 @@ periodRouter.get(
   },
 );
 
-/**
- * @swagger
- */
 periodRouter.post(
   '/new-cycle',
   header('Authorization').isString().withMessage('Authorization header is required'),
@@ -223,9 +214,6 @@ periodRouter.post(
   },
 );
 
-/**
- * @swagger
- */
 periodRouter.post(
   '/mood',
   header('Authorization').isString().withMessage('Authorization header is required'),
@@ -237,7 +225,7 @@ periodRouter.post(
       return res.status(400).json({ errors: errors.array() });
     }
     const token = req.get('Authorization')!.substring(7);
-
+    console.error('mood', req.body.mood);
     recordMood(token, req.body.mood, req.body.dateTime)
       .then((r) => res.sendStatus(200))
       .catch((err) => res.status(403).send(err));
@@ -250,13 +238,10 @@ periodRouter.get('/mood', (req: Request, res: Response) => {
   });
 });
 
-/**
- * @swagger
- */
 periodRouter.post(
   '/symptom',
   header('Authorization').isString().withMessage('Authorization header is required'),
-  body('symptom').isIn(moodOptions).withMessage('Invalid mood option'),
+  body('symptom').isString(),
   body('dateTime').isString().isISO8601().withMessage('Date and time of mood entry is required'),
   (req: Request, res: Response) => {
     const errors = validationResult(req);

@@ -41,6 +41,7 @@ export const getCurrentPeriodCycle = async (token: string) => {
   const userId = (await authorizeUser(token)).id;
   const period = await PeriodCycleModel.findOne({
     where: { userId, to: null },
+    attributes: ['id', 'from', 'predictedTo'],
   });
 
   if (!period) {
@@ -48,13 +49,15 @@ export const getCurrentPeriodCycle = async (token: string) => {
   }
 
   const cycleMoods = await MoodModel.findAll({
-    where: { userId, cycleId: period.id },
+    where: { cycleId: period.id },
     order: [['createdAt', 'DESC']],
+    attributes: ['id', 'date', 'mood'],
   });
 
   const cycleSymptoms = await SymptomModel.findAll({
-    where: { userId, cycleId: period.id },
+    where: { cycleId: period.id },
     order: [['createdAt', 'DESC']],
+    attributes: ['id', 'date', 'symptom'],
   });
 
   return {
