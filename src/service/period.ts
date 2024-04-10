@@ -4,6 +4,7 @@ import PeriodCycleModel from '../model/periodCycle.model';
 import MoodModel from '../model/mood.model';
 import SymptomModel from '../model/symptoms.model';
 import { moodOptions } from '../config';
+import SymptomsModel from '../model/symptoms.model';
 
 export const getTypicalPeriod = async (token: string) => {
   const userId = (await authorizeUser(token)).id;
@@ -196,8 +197,37 @@ export const recordMood = async (
   });
 };
 
-export const recordSymptom = async (token: string, symptom: string, dateTime: string) => {
+export const recordSymptom = async (
+  token: string,
+  symptom: string,
+  dateTime: string,
+  cycleId?: number,
+) => {
   const userId = (await authorizeUser(token)).id;
+  if (cycleId) {
+    const period = await PeriodCycleModel.findOne({
+      where: { id: cycleId },
+    });
+
+    if (!period || period.userId !== userId) {
+      throw new Error('No active period cycle found');
+    }
+
+    const symptomEntry = await SymptomModel.findOne({
+      where: { cycleId, date: new Date(dateTime) },
+    });
+
+    if (symptomEntry) {
+      return await symptomEntry.update({ symptom });
+    } else {
+      return await SymptomModel.create({
+        userId,
+        cycleId,
+        symptom,
+        date: new Date(dateTime),
+      });
+    }
+  }
   const period = await PeriodCycleModel.findOne({
     where: { userId, to: null },
   });
