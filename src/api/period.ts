@@ -215,6 +215,24 @@ periodRouter.get(
   },
 );
 
+periodRouter.put(
+  '/previous/:cycleId/mood/:dateTime',
+  header('Authorization').isString().withMessage('Authorization header is required'),
+  body('mood').isIn(moodOptions).withMessage('Invalid mood option'),
+  (req: Request, res: Response) => {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      return res.status(400).json({ errors: errors.array() });
+    }
+    const token = req.get('Authorization')!.substring(7);
+    const cycleId = parseInt(req.params.cycleId, 10);
+
+    recordMood(token, req.body.mood, req.params.dateTime, cycleId)
+      .then((r) => res.sendStatus(200))
+      .catch((err) => res.status(403).send(err));
+  },
+);
+
 periodRouter.post(
   '/new-cycle',
   header('Authorization').isString().withMessage('Authorization header is required'),

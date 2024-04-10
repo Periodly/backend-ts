@@ -141,8 +141,41 @@ const endPeriodCycle = async (userId: number, toDate: string) => {
   return newCycleLength;
 };
 
-export const recordMood = async (token: string, mood: string, dateTime: string) => {
+export const recordMood = async (
+  token: string,
+  mood: string,
+  dateTime: string,
+  cycleId?: number,
+) => {
   const userId = (await authorizeUser(token)).id;
+  if (cycleId) {
+    const period = await PeriodCycleModel.findOne({
+      where: { id: cycleId },
+    });
+
+    if (!period || period.userId !== userId) {
+      throw new Error('No active period cycle found');
+    }
+
+    if (!moodOptions.includes(mood)) {
+      throw new Error('Invalid mood option');
+    }
+
+    const moodEntry = await MoodModel.findOne({
+      where: { cycleId, date: new Date(dateTime) },
+    });
+
+    if (moodEntry) {
+      return await moodEntry.update({ mood });
+    } else {
+      return await MoodModel.create({
+        userId,
+        cycleId,
+        mood,
+        date: new Date(dateTime),
+      });
+    }
+  }
   const period = await PeriodCycleModel.findOne({
     where: { userId, to: null },
   });
