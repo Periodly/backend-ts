@@ -3,6 +3,10 @@ import { authorizeUser } from './user';
 import UserModel from '../model/user.model';
 import { Op } from 'sequelize';
 import BestjaModel from '../model/bestje.model';
+import MoodModel from '../model/mood.model';
+import SymptomModel from '../model/symptoms.model';
+import PeriodCycleModel from '../model/periodCycle.model';
+import TypicalCycleModel from '../model/typicalCycle.model';
 
 export const addFriend = async (token: string, friendName: string, asBeast: boolean = false) => {
   const userId = (await authorizeUser(token)).id;
@@ -78,8 +82,7 @@ export const getFriends = async (token: string, id?: string) => {
   return friendList;
 };
 
-export const getBeast = async (token: string) => {
-  const userId = (await authorizeUser(token)).id;
+const getBeastInfo = async (userId: number) => {
   const beast = await BestjaModel.findOne({
     where: { [Op.or]: [{ userId }, { friendId: userId }] },
   });
@@ -92,5 +95,50 @@ export const getBeast = async (token: string) => {
     where: { id: beast.userId === userId ? beast.friendId : beast.userId },
   });
 
-  return friend?.username;
+  return friend ? friend : Promise.reject('No beast found');
+};
+
+export const getBeast = async (token: string) => {
+  const userId = (await authorizeUser(token)).id;
+
+  getBeastInfo(userId)
+    .then((friend) => {
+      return friend.username;
+    })
+    .catch((err) => {
+      throw new Error(err);
+    });
+};
+
+export const getBeastStats = async (token: string) => {
+  const userId = (await authorizeUser(token)).id;
+  const friend = await getBeastInfo(userId);
+
+  if (friend) {
+    const friendStats = await MoodModel.findOne({
+      where: { userId: friend.id },
+      order: [['createdAt', 'DESC']],
+    });
+    const friendSymptom = await SymptomModel.findOne({
+      where: { userId: friend.id },
+      order: [['createdAt', 'DESC']],
+    });
+    const friendCycle = await PeriodCycleModel.findOne({
+      where: { userId: friend.id },
+      order: [['createdAt', 'DESC']],
+    });
+    const typicalCycle = await TypicalCycleModel.findOne({
+      where: { userId: friend.id },
+    });
+
+    return {
+      beast: friend.username,
+      mood: friendStats?.mood,
+      symptom: friendSymptom?.symptom,
+      cycleLength: typicalCycle?.cycleLength,
+      cycleDay: friendCycle
+        ? Math.floor((new Date().getTime() - friendCycle.from.getTime()) / (1000 * 60 * 60 * 24))
+        : 0,
+    };
+  }
 };

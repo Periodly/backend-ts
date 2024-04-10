@@ -1,6 +1,6 @@
 import express, { Response, Request } from 'express';
 import { body, header, validationResult } from 'express-validator';
-import { addFriend, getBeast, getFriends } from '../service/friends';
+import { addFriend, getBeast, getBeastStats, getFriends } from '../service/friends';
 
 const friendsRouter = express.Router();
 
@@ -266,6 +266,22 @@ friendsRouter.get(
 
     const token = req.get('Authorization')!.substring(7);
     getBeast(token)
+      .then((beast) => res.json({ beast }))
+      .catch((err) => res.status(400).send(err));
+  },
+);
+
+friendsRouter.get(
+  '/beast/status',
+  header('Authorization').isString().contains('Bearer'),
+  (req: Request, res: Response) => {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      return res.status(400).json({ errors: errors.array() });
+    }
+
+    const token = req.get('Authorization')!.substring(7);
+    getBeastStats(token)
       .then((beast) => res.json({ beast }))
       .catch((err) => res.status(400).send(err));
   },
