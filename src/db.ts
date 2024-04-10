@@ -9,6 +9,7 @@ import FriendsModel, { initFriendsModel } from './model/friends.model';
 import PeriodCycleModel, { initPeriodCycleModel } from './model/periodCycle.model';
 import SymptomModel, { initSymptomModel } from './model/symptoms.model';
 import TypicalCycleModel, { initTypicalCycleModel } from './model/typicalCycle.model';
+import BestjaModel, { initBestjaModel } from './model/bestje.model';
 
 export const sequelize = new Sequelize(dbConfig.database, dbConfig.user, '', {
   dialect: 'mariadb',
@@ -50,6 +51,7 @@ initFriendsModel(sequelize);
 initPeriodCycleModel(sequelize);
 initSymptomModel(sequelize);
 initTypicalCycleModel(sequelize);
+initBestjaModel(sequelize);
 
 PeriodCycleModel.hasMany(MoodModel);
 MoodModel.belongsTo(PeriodCycleModel, { foreignKey: 'cycleId' });
@@ -66,3 +68,7 @@ PeriodCycleModel.belongsTo(UserModel, { foreignKey: 'userId' });
 
 PeriodCycleModel.hasMany(SymptomModel);
 SymptomModel.belongsTo(PeriodCycleModel, { foreignKey: 'cycleId' });
+
+UserModel.hasMany(BestjaModel);
+BestjaModel.belongsTo(UserModel, { foreignKey: 'userId' });
+BestjaModel.belongsTo(UserModel, { foreignKey: 'friendId' });
