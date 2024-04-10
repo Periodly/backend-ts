@@ -1,6 +1,16 @@
-import express from 'express';
+import { Router, Request, Response } from 'express';
+import { body, header, validationResult } from 'express-validator';
+import {
+  getCurrentPeriodCycle,
+  getTypicalPeriod,
+  initNewPeriodCycle,
+  recordMood,
+  recordSymptom,
+  updateTypicalPeriod,
+} from '../service/period';
+import { moodOptions } from '../config';
 
-const periodRouter = express.Router();
+const periodRouter = Router();
 
 /**
  * @swagger
@@ -131,5 +141,134 @@ const periodRouter = express.Router();
  *         description: The actual end date of the period.
  *         example: 2021-01-07T00:00:00Z
  */
+
+/**
+ * @swagger
+ */
+periodRouter.get(
+  '/typical',
+  header('Authorization').isString().withMessage('Authorization header is required'),
+  (req: Request, res: Response) => {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      return res.status(400).json({ errors: errors.array() });
+    }
+    const token = req.get('Authorization')!.substring(7);
+    getTypicalPeriod(token)
+      .then((typicalPeriod) => res.json(typicalPeriod))
+      .catch((err) => res.status(403).send(err));
+  },
+);
+
+periodRouter.put(
+  '/typical',
+  header('Authorization').isString().withMessage('Authorization header is required'),
+  body('cycleLength').optional().isInt({ min: 1 }),
+  body('regularity').optional().isBoolean(),
+  body('mostCommonSymptom').optional().isString(),
+  (req: Request, res: Response) => {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      return res.status(400).json({ errors: errors.array() });
+    }
+    const token = req.get('Authorization')!.substring(7);
+
+    updateTypicalPeriod(
+      token,
+      req.body.cycleLength,
+      req.body.regularity,
+      req.body.mostCommonSymptom,
+    )
+      .then((r) => res.sendStatus(200))
+      .catch((err) => res.status(403).send(err));
+  },
+);
+
+/**
+ * @swagger
+ */
+periodRouter.get(
+  '/current',
+  header('Authorization').isString().withMessage('Authorization header is required'),
+  (req: Request, res: Response) => {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      return res.status(400).json({ errors: errors.array() });
+    }
+    const token = req.get('Authorization')!.substring(7);
+
+    getCurrentPeriodCycle(token)
+      .then((periodCycle) => res.json(periodCycle))
+      .catch((err) => res.status(403).send(err));
+  },
+);
+
+/**
+ * @swagger
+ */
+periodRouter.post(
+  '/new-cycle',
+  header('Authorization').isString().withMessage('Authorization header is required'),
+  body('from').isString().isISO8601().withMessage('from date is required'),
+  (req: Request, res: Response) => {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      return res.status(400).json({ errors: errors.array() });
+    }
+    const token = req.get('Authorization')!.substring(7);
+
+    initNewPeriodCycle(token, req.body.from)
+      .then((r) => res.sendStatus(200))
+      .catch((err) => res.status(403).send(err));
+  },
+);
+
+/**
+ * @swagger
+ */
+periodRouter.post(
+  '/mood',
+  header('Authorization').isString().withMessage('Authorization header is required'),
+  body('mood').isIn(moodOptions).withMessage('Invalid mood option'),
+  body('dateTime').isString().isISO8601().withMessage('Date and time of mood entry is required'),
+  (req: Request, res: Response) => {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      return res.status(400).json({ errors: errors.array() });
+    }
+    const token = req.get('Authorization')!.substring(7);
+
+    recordMood(token, req.body.mood, req.body.dateTime)
+      .then((r) => res.sendStatus(200))
+      .catch((err) => res.status(403).send(err));
+  },
+);
+
+periodRouter.get('/mood', (req: Request, res: Response) => {
+  res.json({
+    moodList: moodOptions,
+  });
+});
+
+/**
+ * @swagger
+ */
+periodRouter.post(
+  '/symptom',
+  header('Authorization').isString().withMessage('Authorization header is required'),
+  body('symptom').isIn(moodOptions).withMessage('Invalid mood option'),
+  body('dateTime').isString().isISO8601().withMessage('Date and time of mood entry is required'),
+  (req: Request, res: Response) => {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      return res.status(400).json({ errors: errors.array() });
+    }
+    const token = req.get('Authorization')!.substring(7);
+
+    recordSymptom(token, req.body.symptom, req.body.dateTime)
+      .then((r) => res.sendStatus(200))
+      .catch((err) => res.status(403).send(err));
+  },
+);
 
 export default periodRouter;
