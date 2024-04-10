@@ -51,7 +51,7 @@ initPeriodCycleModel(sequelize);
 initSymptomModel(sequelize);
 initTypicalCycleModel(sequelize);
 
-PeriodCycleModel.hasOne(MoodModel);
+PeriodCycleModel.hasMany(MoodModel);
 MoodModel.belongsTo(PeriodCycleModel, { foreignKey: 'cycleId' });
 
 UserModel.hasMany(FriendsModel);
