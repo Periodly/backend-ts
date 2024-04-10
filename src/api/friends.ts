@@ -1,6 +1,6 @@
 import express, { Response, Request } from 'express';
 import { body, header, validationResult } from 'express-validator';
-import { addFriend, getFriends } from '../service/friends';
+import { addFriend, getBeast, getFriends } from '../service/friends';
 
 const friendsRouter = express.Router();
 
@@ -197,6 +197,76 @@ friendsRouter.post(
     const token = req.get('Authorization')!.substring(7);
     addFriend(token, req.body.friendName)
       .then((r) => res.json(r))
+      .catch((err) => res.status(400).send(err));
+  },
+);
+
+/**
+ * @swagger
+ * /api/friends/beast:
+ *   post:
+ *     description: Sends a Beast request to friend.
+ *     security:
+ *       - BearerAuth: []
+ *     tags: [Friends]
+ *     produces:
+ *       - application/json
+ *     parameters:
+ *       - in: body
+ *         name: friendName
+ *         description: Name of the friend to add.
+ *         required: true
+ *         type: string
+ *     responses:
+ *       200:
+ *         description: Request sent successfully.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: array
+ *               items:
+ *                 type: string
+ *       400:
+ *         description: Bad request (validation errors, friend already exists, or other error during friend addition).
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 errors:
+ *                   type: array
+ *                   items:
+ *                     type: object
+ */
+friendsRouter.post(
+  '/beast',
+  body('friendName').isString(),
+  header('Authorization').isString().contains('Bearer'),
+  (req: Request, res: Response) => {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      return res.status(400).json({ errors: errors.array() });
+    }
+
+    const token = req.get('Authorization')!.substring(7);
+    addFriend(token, req.body.friendName, true)
+      .then((r) => res.json(r))
+      .catch((err) => res.status(400).send(err));
+  },
+);
+
+friendsRouter.get(
+  '/beast',
+  header('Authorization').isString().contains('Bearer'),
+  (req: Request, res: Response) => {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      return res.status(400).json({ errors: errors.array() });
+    }
+
+    const token = req.get('Authorization')!.substring(7);
+    getBeast(token)
+      .then((beast) => res.json({ beast }))
       .catch((err) => res.status(400).send(err));
   },
 );

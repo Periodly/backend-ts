@@ -2,13 +2,36 @@ import FriendsModel from '../model/friends.model';
 import { authorizeUser } from './user';
 import UserModel from '../model/user.model';
 import { Op } from 'sequelize';
+import BestjaModel from '../model/bestje.model';
 
-export const addFriend = async (token: string, friendName: string) => {
+export const addFriend = async (token: string, friendName: string, asBeast: boolean = false) => {
   const userId = (await authorizeUser(token)).id;
   const friend = await UserModel.findOne({ where: { username: friendName } });
 
   if (!friend) {
     throw new Error('User not found');
+  }
+
+  if (asBeast) {
+    const beast = await BestjaModel.findOne({
+      where: { [Op.or]: [{ userId: userId }, { friendId: userId }] },
+    });
+
+    const beastFriendship = await BestjaModel.findOne({
+      where: {
+        [Op.or]: [
+          { userId, friendId: friend.id },
+          { userId: friend.id, friendId: userId },
+        ],
+      },
+    });
+
+    if (beast)
+      throw new Error(
+        'User already has a beast' + (beastFriendship ? ' and its the user you want to add' : ''),
+      );
+
+    return await BestjaModel.create({ userId, friendId: friend.id });
   }
 
   const friendship = await FriendsModel.findOne({
@@ -53,4 +76,21 @@ export const getFriends = async (token: string, id?: string) => {
     friendList.push(friendName);
   });
   return friendList;
+};
+
+export const getBeast = async (token: string) => {
+  const userId = (await authorizeUser(token)).id;
+  const beast = await BestjaModel.findOne({
+    where: { [Op.or]: [{ userId }, { friendId: userId }] },
+  });
+
+  if (!beast) {
+    throw new Error('No beast found');
+  }
+
+  const friend = await UserModel.findOne({
+    where: { id: beast.userId === userId ? beast.friendId : beast.userId },
+  });
+
+  return friend?.username;
 };
