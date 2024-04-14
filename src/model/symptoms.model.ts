@@ -5,6 +5,7 @@ class SymptomModel extends Model {
   declare date: Date;
   declare cycleId: number;
   declare symptom: string;
+  declare flowType: number; // 0: none, 1: light, 2: medium, 3: heavy
 }
 
 export const initSymptomModel = (sequelize: Sequelize) => {
@@ -29,7 +30,12 @@ export const initSymptomModel = (sequelize: Sequelize) => {
       },
       symptom: {
         type: DataTypes.STRING,
+        allowNull: true,
+      },
+      flowType: {
+        type: DataTypes.INTEGER,
         allowNull: false,
+        defaultValue: 0,
       },
     },
     {

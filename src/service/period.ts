@@ -85,7 +85,7 @@ const getPeriodCycle = async (cycleId: number) => {
   const cycleSymptoms = await SymptomModel.findAll({
     where: { cycleId },
     order: [['createdAt', 'DESC']],
-    attributes: ['id', 'date', 'symptom'],
+    attributes: ['id', 'date', 'symptom', 'flowType'],
   });
 
   return {

@@ -111,8 +111,7 @@ export const getBeast = async (token: string) => {
 };
 
 export const getBeastStats = async (token: string) => {
-  const userId = (await authorizeUser(token)).id;
-  const friend = await getBeastInfo(userId);
+  const friend = await getBeastInfo((await authorizeUser(token)).id);
 
   if (friend) {
     const friendCycle = await PeriodCycleModel.findOne({
