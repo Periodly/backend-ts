@@ -115,16 +115,16 @@ export const getBeastStats = async (token: string) => {
   const friend = await getBeastInfo(userId);
 
   if (friend) {
-    const friendStats = await MoodModel.findOne({
+    const friendCycle = await PeriodCycleModel.findOne({
       where: { userId: friend.id },
+      order: [['createdAt', 'DESC']],
+    });
+    const friendStats = await MoodModel.findOne({
+      where: { cycleId: friendCycle?.id },
       order: [['createdAt', 'DESC']],
     });
     const friendSymptom = await SymptomModel.findOne({
-      where: { userId: friend.id },
-      order: [['createdAt', 'DESC']],
-    });
-    const friendCycle = await PeriodCycleModel.findOne({
-      where: { userId: friend.id },
+      where: { cycleId: friendCycle?.id },
       order: [['createdAt', 'DESC']],
     });
     const typicalCycle = await TypicalCycleModel.findOne({
