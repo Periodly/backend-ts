@@ -101,6 +101,9 @@ userRouter.post(
   body('password').isString().isLength({
     min: minPasswordLength,
   }),
+  body('cycleLength').optional().isInt({ min: 1 }),
+  body('regularity').optional().isBoolean(),
+  body('mostCommonSymptom').optional().isString(),
   body('isAdmin').optional().isBoolean(),
   body('isAdmin').custom((value, { req }) => {
     if (value && !req.headers!.authorization) {
@@ -116,7 +119,15 @@ userRouter.post(
     }
     const isAdmin = req.body.isAdmin || false;
     const token = req.get('Authorization')!.substring(7);
-    createUser(req.body.username, req.body.password, isAdmin, token)
+    createUser(
+      req.body.username,
+      req.body.password,
+      req.body.cycleLength,
+      req.body.regularity === 'true',
+      req.body.mostCommonSymptom,
+      isAdmin,
+      token,
+    )
       .then(() => res.sendStatus(200))
       .catch((err) => res.status(400).send(err));
   },

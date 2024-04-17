@@ -2,10 +2,14 @@ import { JwtTokenPayload, secret_token } from '../config';
 import jwt from 'jsonwebtoken';
 import { hashPassword } from '../tools/password';
 import User from '../model/user.model';
+import TypicalCycleModel from '../model/typicalCycle.model';
 
 export async function createUser(
   username: string,
   password: string,
+  cycleLength: number,
+  regularity: boolean,
+  mostCommonSymptom: string,
   isAdmin: boolean,
   token?: string,
 ): Promise<void> {
@@ -22,8 +26,17 @@ export async function createUser(
       },
     });
     if (!created) return Promise.reject('User already exists');
+
+    await TypicalCycleModel.create({
+      userId: user.id,
+      cycleLength,
+      regularity,
+      mostCommonSymptom,
+    });
+
+    return Promise.resolve();
   } catch (err: any) {
-    throw 'User already exists';
+    throw new Error(err);
   }
 }
 
